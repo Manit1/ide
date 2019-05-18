@@ -8,8 +8,10 @@
     <input class="black search" type="text" placeholder="🔍 Search by title..." v-model=searchStr @change=searchTextChanged>
     </div>
     <CodeList :codes=codes></CodeList>
-    <button type="button" class="btn btn-sm btn-run" @click="loadMore()">
-      <span> Load More </span>
+    <button type="button" class="btn btn-sm btn-run" @click="loadMore()" 
+        :class="{ loading : disabled }" :disabled="loading">
+      <span v-if="loading">Loading</span>
+      <span v-else>Load More</span>
     </button>
   </div>
 </template>
@@ -30,7 +32,8 @@ export default {
     return {
       searchStr: '',
       codes: [],
-      currentOffset: 0
+      currentOffset: 0,
+      loading: false
     }
   },
   computed: mapState({
@@ -53,18 +56,24 @@ export default {
       this.codes = data.codes
     },
     async loadMore () {
-      const title = this.searchStr
-      const offset = this.currentOffset + 20
-      const { data } = await httpGet('/code', {
-        filter: {
-          title: {
-            $iLike: `%${title}%`
-          }
-        },
-        offset
-      })
-      this.codes.concat(data.codes)
-      this.offset = offset
+      try {
+        this.loading = true
+        const title = this.searchStr
+        const offset = this.currentOffset + 20
+        const { data } = await httpGet('/code', {
+          filter: {
+            title: {
+              $iLike: `%${title}%`
+            }
+          },
+          offset
+        })
+        this.codes.concat(data.codes)
+        this.offset = offset
+      } catch (err) {
+        console.log(err)
+      }
+      this.loading = false
     },
     searchTextChanged (e) {
       this.fetchCodes(this.searchStr)

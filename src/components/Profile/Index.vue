@@ -33,12 +33,18 @@ export default {
       searchStr: '',
       codes: [],
       currentOffset: 0,
-      loading: false
+      loading: false,
+      codeCount: 0
     }
   },
-  computed: mapState({
-    userStore: 'user'
-  }),
+  computed: {
+    haveMoreCodes: function() {
+      return this.currentOffset + 20 < codeCount
+    },
+    ...mapState({
+      userStore: 'user'
+    })
+  },
   async created () {
     this.fetchCodes()
   },
@@ -54,6 +60,7 @@ export default {
         limit
       })
       this.codes = data.codes
+      this.codeCount = data.count
     },
     async loadMore () {
       try {

@@ -9,7 +9,7 @@
     </div>
     <CodeList :codes=codes></CodeList>
     <button type="button" class="btn btn-sm btn-run" @click="loadMore()" 
-        :class="{ loading : disabled }" :disabled="loading">
+        :class="{ loading : disabled }" :disabled="loading" v-if="haveMoreCodes">
       <span v-if="loading">Loading</span>
       <span v-else>Load More</span>
     </button>
